@@ -23,15 +23,13 @@ from io import BytesIO
 
 ##################################################################
 
-def connect2gmail():
+def connect2gmail(credentials_path, token_path):
     #choose SCOPE https://developers.google.com/gmail/api/auth/scopes
     SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send',
     'https://www.googleapis.com/auth/gmail.modify',
 ]
-    credentials_path =  "C:/Users/morel/Documents/Library/CodingTime/GitHub/robinhood/Scrap/gmai1/log_files/client_secret.json"
-    token_path =   "C:/Users/morel/Documents/Library/CodingTime/GitHub/robinhood/Scrap/gmai1/log_files/token.json"
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
     """
@@ -52,7 +50,7 @@ def connect2gmail():
         # Save the credentials for the next run
         with open(token_path, 'w') as token:
             token.write(creds.to_json())
-
+            
     try:
         # Call the Gmail API
         service = build('gmail', 'v1', credentials=creds)
