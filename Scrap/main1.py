@@ -7,16 +7,16 @@ from planning import *
 from driv3r import *
 from m0ng0 import *
 from gmai1.quickstart import *
-
 from datetime import datetime
 import time
 import numpy as np
 
-
-#gmail
-service = connect2gmail()
-query = "is:unread (from:mail address 1 OR from:mail address 2 OR mail address 3)"
-destination = 'mail address'
+#quickstar.py config
+credentials_path = "PathToProject/gmai1/log_files/client_secret.json"
+token_path = "PathToProject/gmai1/log_files/token.json"
+service = connect2gmail(credentials_path, token_path)
+query = "is:unread (from:mail_address_1 OR from:mail_address_2 OR mail_address_3)"
+destination = 'mail_address_to_receive_status'
 subject = 'Status'
 
 ###
@@ -46,13 +46,13 @@ capchat_occurrence_since_begening = []
 sent = []
 VignetteHeight = []
 lastVignetteHeight = 0
-#Initiat variables relatively to previous scrap
-##connect to mongoDB
+#Initiate variables relatively to previous scrap
+#connect to mongoDB
 collection = connect2collection('DB_name', 'Collection_name')
-#If collection empty
+#A: collection is empty
 if collection.count_documents({}) == 0:
-    print('h')
-    #itérateurs
+    print("A")
+    #iterators
     page = 1
     i = 1
     driver.get('url to scrap')
@@ -63,15 +63,15 @@ if collection.count_documents({}) == 0:
     vignettes = init_v[1]
     current_scroll_position = driver.execute_script("return arguments[0].scrollTop;", vignettes_window)
     last_capchat_occurrence_since_begening = 0
+#B: Collection is not empty
 else:
-    #If collection not empty
     last_i =  last_value(collection, 'indexDANSlaPage')
     last_page = last_value(collection, 'numeroDEpage')
     last_capchat_occurrence_since_begening = last_value(collection, 'capchat_occurrence_since_begening')
     tot_vignettes_in_page = last_value(collection, 'totalVignettesInPage')
-    #If last inserted page completed
+#B1: last inserted page completed
     if last_i == tot_vignettes_in_page:
-        print('f')
+        print('B1')
         #itérateurs
         page = last_page + 1
         i = 1
@@ -86,10 +86,9 @@ else:
         vignettes_window = init_v[0]
         vignettes = init_v[1]
         current_scroll_position = driver.execute_script("return arguments[0].scrollTop;", vignettes_window)
+    #B2: Last inserted page not completed
     else:
-        print('g')
-        #If last inserted page not completed
-        #itérateurs
+        #iterators
         i = last_i + 1 
         page = last_page  
         driver.get(f'url_to scrap_page={page}')
