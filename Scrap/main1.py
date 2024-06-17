@@ -62,7 +62,7 @@ if collection.count_documents({}) == 0:
     vignettes_window = init_v[0]
     vignettes = init_v[1]
     current_scroll_position = driver.execute_script("return arguments[0].scrollTop;", vignettes_window)
-    last_capchat_occurrence_since_begening = 0
+    last_capchat_occurrence_since_begening = -1
 #B: Collection is not empty
 else:
     last_i =  last_value(collection, 'indexDANSlaPage')
