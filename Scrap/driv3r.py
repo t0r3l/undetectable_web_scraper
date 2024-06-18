@@ -173,60 +173,51 @@ def scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, Vi
 
 #This function keeps track of capchats by recordig their url, source code and appearence to handle them. To make this function efficient a file system must be 
 #created as the one provided in the repository
-def capchat_recording(driver, capchat_witness):
-    driver.save_screenshot(f"project_path/capchat_control/screenshots/capchatscreenshot{capchat_witness}.png")
+def capchat_recording(driver, last_capchat_witness):
+    driver.save_screenshot(f"project_path/capchat_control/screenshots/capchatscreenshot{last_capchat_witness}.png")
     # Get the page source code
     page_source = driver.page_source
     # Specify the path where you want to save the page source code file
-    file_path = f"project_path/capchat_control/codes_sources/capchat_source{capchat_witness}.html"
+    file_path = f"project_path/capchat_control/codes_sources/capchat_source{last_capchat_witness}.html"
     # Save the page source code to the specified file path
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(page_source)
     # Get the current URL
     current_url = driver.current_url
     # Specify the path where you want to save the URL to a file
-    url_path = f"project_path/capchat_control/url/capchat_url{capchat_witness[-1]}.txt"
+    url_path = f"project_path/capchat_control/url/capchat_url{last_capchat_witness}.txt"
     # Save the URL to the specified path
     with open(url_path, "w") as file:
         file.write(current_url)
 
 
 
-def scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, capchat_witness, vignettes_window, current_scroll_position, last_capchat_witness,vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize, refreshing = 0):
+def scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, vignettes_window, current_scroll_position, last_capchat_witness,vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize, refreshing = 0):
     reset_v2 = 0
+    #A: Retrieve vignette's information
     try: 
-        print('y')
         WebDriverWait(driver,600).until(
                         EC.presence_of_all_elements_located((By.XPATH, elementXPATH))
                         )
         sleep(2)
-        #if two variable to scrap are contained in the same element; it can be handled this way
+        #A1: Normal retrieving
+         else:                                     
+            elementList.append(driver.find_element(By.XPATH, elementXPATH).text)
+        #A2: Two informations are contained in the same XPATH see Readme scrap_var_i in part IV Scraping a page
         if l_control == iplus:
             scrap_var_i_and_iplus_HTML= driver.find_element(By.XPATH, elementXPATH)
-            scrap_var_i= scrap_var_i[-1]
-            elementList.append(scrap_var_i_and_iplus_HTML.text.lstrip(scrap_var_i))
-        else:                                     
-            elementList.append(driver.find_element(By.XPATH, elementXPATH).text)
+            scrap_var_i = scrap_var_i[-1]
+            elementList.append(scrap_var_i_and_iplus_HTML.text.lstrip(scrap_var_i))  
+        #Iterator of vignette's informations is incremented by 1    
         l_control += 1
-        #if list no empty take last element
-        if capchat_witness != []:
-            last_capchat_witness = capchat_witness[-1]
-        #elif list and DB empty 
-        elif last_capchat_witness == -1:
-            last_capchat_witness = 0
-        #else list empty but not DB or last_capchat_witness => no need for modification of variable
-        #else: 
-        #	last_capchat_witness = 	last_capchat_witness)
-    except (TimeoutException, StaleElementReferenceException, NoSuchElementException, WebDriverException):                                                                                                                                                                                
+    #B: XPATH not found
+    except (TimeoutException, StaleElementReferenceException, NoSuchElementException, WebDriverException):   
+        #B1: Capchat occured
         if driver.current_url not in ['possible_url_1', f'possible_url_page={page}']:
-            if capchat_witness != []:
-                last_capchat_witness = capchat_witness[-1] + 1
-            elif last_capchat_witness == -1:
-                last_capchat_witness = 1
-            else:
-                last_capchat_witness = last_capchat_witness + 1
+            last_capchat_witness += 1
                 print('CAPCHAT?')
-            capchat_recording(driver, capchat_witness)   
+            #save informations about capchat
+            capchat_recording(driver, last_capchat_witness)   
             #try: 
                 #WebDriverWait(driver,10).until(
                             # EC.presence_of_all_elements_located((By.XPATH, capchatXPATH))
@@ -235,33 +226,36 @@ def scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, capch
                             #retry to same point
                             # except (TimeoutException, StaleElementReferenceException, NoSuchElementException, WebDriverException):
                                 #refresh page and retry to same point
-        elif l_control == i:
-            # in case of a detected variable of index i which often misses
+        #B2: We are dealing with a variable of index z which often misses
+        elif l_control == z:
             elementList.append('Na')
             l_control += 1
-            #if list no empty take last element
-            if capchat_witness != []:
-                last_capchat_witness = capchat_witness[-1]
-            #elif list and DB empty 
-            elif last_capchat_witness == -1:
-                last_capchat_witness = 0
+        #B3: None of the above cases => try to get results by refreshing page one time
         else:
             if refreshing == 0:
+                #Might be sent through gmail api
                 print('charging?')
+                #incrementing 
                 refreshing = 1
                 driver.refresh()
                 sleep(np.random.uniform(300,500))
+                #reseting vignette window selector
                 reset_v2 = get_window_and_vignettes(driver,vignettes_window_XPATH, vignettes_selector)
                 vignettes_window = reset_v2[0]
                 last_scroll_position = current_scroll_position
+                #get back to previous scroll position
                 current_scroll_position = driver.execute_script("return arguments[0].scrollTop;", vignettes_window)
                 current_scroll_position = scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, VignetteSize, last_scroll_position)
-                scrap(driver, elementList, l_control, nomPoste, elementXPATH, page, capchat_witness, vignettes_window, current_scroll_position, last_capchat_witness, vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize, refreshing)
-                #retrieve if possible
-                #if capchat solve then retry 
-                #else restart session
+                #Retry retrieving
+                Scrap = scrap(driver, elementList, l_control, nomPoste, elementXPATH, page, capchat_witness, vignettes_window, current_scroll_position, last_capchat_witness, vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize, refreshing)
+                l_control = Scrap[0]
+                last_capchat_witness = Scrap[1]
+                #HOmogeneiser les paramètres
+                #investiguer récupération des variables avec la récursivité
             else:
                 print('refreshing failed')
+                #Keep session open to see the problem 
+                #gmail API might be used here to warn technician
                 while 2 + 2 == 4:
                     sleep(1)
     list2return =  [l_control, last_capchat_witness, reset_v2]
