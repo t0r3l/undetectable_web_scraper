@@ -107,6 +107,8 @@ L = [scrap_var_1, scrap_var_i, scrap_var_n, numeroDEpage, indexDANSlaPage , posi
 ###################################################################################
 
 while 2 + 2 == 4:
+    #Here index is the loop iterator and i is our step which is incremented each time we pass to anothr vignette
+    #Reason of substracting 1 from i is that [:] selector is the python equivalent of mathematical [:[
     for index in range(0, len(vignettes[i-1:])):
         vignette = vignettes[i-1]
         if (current_time() < schedule[1] or (current_time() >= schedule[2] & current_time() < schedule[3])): 
@@ -123,12 +125,14 @@ while 2 + 2 == 4:
             scrap_var_i_XPATH = f'XPATHi/tag[{i}]'
             scrap_var_n_XPATH = f'XPATHn/tag[{i}]'
             VignetteSize = vignette.size['height']
-            #if a previous session did not finish to scrap each vignette
+            #A: if a previous session did not finish to scrap each vignette
             if lastVignetteHeight != 0:
                 VignetteHeight.append(VignetteSize + lastVignetteHeight)
                 lastVignetteHeight = 0
-            elif VignetteHeight != [] and i != 1:
+            #B Not first retrieval of a page
+            elif i != 1:
                 VignetteHeight.append(VignetteSize + VignetteHeight[-1])
+            #C First vignette of a page 
             else:
                 VignetteHeight.append(VignetteSize)
             #X contains variables XPATH that we are reaching to scrap
@@ -136,7 +140,7 @@ while 2 + 2 == 4:
             l_control = 0
             print(i)
             for elementList, elementXPATH in zip(L[0:n], X):
-                Scrap = scrap(driver, elementList, l_control, elementXPATH, page, capchat_occurrence_since_begening, vignettes_window, current_scroll_position, last_capchat_occurrence_since_begening, vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize)
+                Scrap = scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, vignettes_window, current_scroll_position, last_capchat_occurrence_since_begening, vignettes_window_XPATH, vignettes_selector, VignetteHeight[-1], VignetteSize)
                 l_control = Scrap[0]
                 last_capchat_occurrence_since_begening = Scrap[1]
                 #means that DOM has changed due to refreshing
@@ -150,16 +154,17 @@ while 2 + 2 == 4:
             numeroDEpage.append(page)
             totalVignettesInPage.append(len(vignettes))
             sent.append('False')
+            #Print last vignette for debuging
             result = '###'.join(str(m[-1]) if len(m) > 0 else '' for m in L)
             print(result)
             sleep(np.random.uniform(20,40))
             #random nap (not advised while testing)
             # if int(np.random.uniform(1,100)) == 42:
             #     sleep(np.random.uniform(120,720))
+            #If remaining vignettes in page
             if i < number_of_vignettes_in_a_page:
                 try:
-                    #scroll()
-                    # eg: current_scroll_position of vignette1 = start of vignette2 position
+                    #current_scroll_position of vignette_i = start of vignette_i_plus_1 position
                     current_scroll_position = scroll(driver, vignettes_window, current_scroll_position, VignetteHeight[-1], VignetteSize)
                 except StaleElementReferenceException:
                     print('?')
