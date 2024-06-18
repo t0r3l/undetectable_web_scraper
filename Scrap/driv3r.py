@@ -113,23 +113,26 @@ def go2nextpage(driver, vignettes_window):
 def scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, VignetteSize, last_scroll_position = 0):
     #if last_scroll_position == True meaning argument has been passed for it otherwise == 0 so False
     #the folowing block is meant to keep deviation in [-1, 1]; function resets deviation to 0 otherwise
-    if type(VignetteHeight) == list and last_scroll_position == 0:
-        VignetteHeight = VignetteHeight[-1]
-    elif type(VignetteHeight) == list and last_scroll_position == 0:
-        VignetteHeight = VignetteHeight[-2]
+    #Initiating variables
     up_or_down = np.random.uniform(0, 1.1)*(-1)**np.random.choice([1, 2])
+    #if deviation exceeds setted value  (line 126) scrolling will opere to exact position of start of following vignette 
     deviation = 0
     scroll_position_to_compare = 0
+    #scrolling is made from a vignette to the consecutive one (see line 166 & 171 mai1.py)
     if last_scroll_position == 0:
         print('a')
+        #Sum of last_scroll_position and VignetteSize(length of vignette to scroll)
         scroll_position_to_compare = current_scroll_position + VignetteSize
+        #VignetteHeight is the exact position of last scraped vignette??????????????????????????
         deviation = (VignetteHeight - scroll_position_to_compare)
+        #If deviation outrange [-1:1] the scrolling is reset to to VignetteHeight
         if (deviation >= 1 or deviation <= -1):
             up_or_down = deviation
         scroll_distance = round(VignetteSize + up_or_down, 2)
     else:
         print('b')
         scroll_distance = last_scroll_position
+    #random number between 1 and 2
     number_of_scrolls = int(np.random.uniform(1,3))
     if number_of_scrolls == 1:
         print('c')
