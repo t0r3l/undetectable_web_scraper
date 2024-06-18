@@ -201,14 +201,14 @@ def scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, vigne
                         )
         sleep(2)
         #A1: Normal retrieving
-         else:                                     
+        if l_control != iplus:                                     
             elementList.append(driver.find_element(By.XPATH, elementXPATH).text)
         #A2: Two informations are contained in the same XPATH see Readme scrap_var_i in part IV Scraping a page
-        if l_control == iplus:
+        else:
             scrap_var_i_and_iplus_HTML= driver.find_element(By.XPATH, elementXPATH)
             scrap_var_i = scrap_var_i[-1]
             elementList.append(scrap_var_i_and_iplus_HTML.text.lstrip(scrap_var_i))  
-        #Iterator of vignette's informations is incremented by 1    
+        #Iterator of vignette's variables is incremented by 1    
         l_control += 1
     #B: XPATH not found
     except (TimeoutException, StaleElementReferenceException, NoSuchElementException, WebDriverException):   
@@ -247,11 +247,10 @@ def scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, vigne
                 current_scroll_position = driver.execute_script("return arguments[0].scrollTop;", vignettes_window)
                 current_scroll_position = scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, VignetteSize, last_scroll_position)
                 #Retry retrieving
-                Scrap = scrap(driver, elementList, l_control, nomPoste, elementXPATH, page, capchat_witness, vignettes_window, current_scroll_position, last_capchat_witness, vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize, refreshing)
+                Scrap = scrap(driver, elementList, l_control, scrap_var_i, elementXPATH, page, vignettes_window, current_scroll_position, last_capchat_witness, vignettes_window_XPATH, vignettes_selector, VignetteHeight, VignetteSize, refreshing)
                 l_control = Scrap[0]
                 last_capchat_witness = Scrap[1]
-                #HOmogeneiser les paramètres
-                #investiguer récupération des variables avec la récursivité
+            #B4: Failure of the program
             else:
                 print('refreshing failed')
                 #Keep session open to see the problem 
