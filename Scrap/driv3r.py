@@ -12,7 +12,7 @@ from time import sleep
 import numpy as np
 
 
-#The project of lunching the bot on a debian server had been initialize however averted due to troubles to mask fingerprinting and lake of time
+#The project of lunching the bot on a debian server had been initialize however avorted due to troubles to mask fingerprinting and lake of time
 def DriverDeb():
     br_ver = OperationSystemManager().get_browser_version_from_os(ChromeType.GOOGLE)
     version_main=int(br_ver.split('.')[0])
@@ -123,7 +123,7 @@ def scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, Vi
         print('a')
         #Sum of last_scroll_position and VignetteSize(length of vignette to scroll)
         scroll_position_to_compare = current_scroll_position + VignetteSize
-        #VignetteHeight is the exact position of last scraped vignette??????????????????????????
+        #VignetteHeight is the exact position of last scraped vignette
         deviation = (VignetteHeight - scroll_position_to_compare)
         #If deviation outrange [-1:1] the scrolling is reset to to VignetteHeight
         if (deviation >= 1 or deviation <= -1):
@@ -134,6 +134,7 @@ def scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, Vi
         scroll_distance = last_scroll_position
     #random number between 1 and 2
     number_of_scrolls = int(np.random.uniform(1,3))
+    #Case 1: scrolling will opere in one scroll
     if number_of_scrolls == 1:
         print('c')
         for i in range(int(scroll_distance)):
@@ -143,6 +144,7 @@ def scroll(driver, vignettes_window, current_scroll_position, VignetteHeight, Vi
         #Add/subtract float part
         driver.execute_script("arguments[0].scrollTop = arguments[1];", vignettes_window, current_scroll_position + scroll_distance - int(scroll_distance))
         current_scroll_position += scroll_distance - int(scroll_distance)
+    #Case 2: scrolling will be splited in two parts
     else: 
         print('d')
         #split scrolling in two sequences  
