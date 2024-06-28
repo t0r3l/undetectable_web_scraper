@@ -3,3 +3,6 @@
 
 # Ignore documentation files
 docs/** linguist-documentation
+
+#Mark py files as python
+*.py linguist-language=Python
