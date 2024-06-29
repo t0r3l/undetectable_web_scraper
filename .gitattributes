@@ -1,10 +1,2 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-
-# Ignore documentation files
-*.docx linguist-vendored
-*.pdf linguist-vendored
-
-#Mark .py as Python
-*.py linguist-language=Python
-
