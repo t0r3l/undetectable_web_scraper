@@ -2,5 +2,6 @@
 * text=auto
 
 # Ignore documentation files
-docs/** linguist-documentation
+*.docx linguist-vendored
+*.pdf linguist-vendored
 
